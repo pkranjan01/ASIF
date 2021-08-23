@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking" xmlns:validation="http://www.mulesoft.org/schema/mule/validation"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/validation http://www.mulesoft.org/schema/mule/validation/current/mule-validation.xsd
+http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd">
+	<validation:config name="Validation_Config" doc:name="Validation Config" doc:id="a486b524-b1b8-4d8c-9499-0e21739925b2" i18n="stream maximum size" />
+	<flow name="errorhandling_mule4Flow" doc:id="3c9bad25-21af-4091-af52-4e17e0c32e34" >
+		<scheduler doc:name="Scheduler" doc:id="55cb816d-05be-4856-9175-45fa545c8d8b" >
+			<scheduling-strategy >
+				<fixed-frequency />
+			</scheduling-strategy>
+		</scheduler>
+		<ee:transform doc:name="Transform Message" doc:id="468e38e9-351d-4960-bfa3-e741311f2d0a" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+{
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="Transform Message" doc:id="d298cd51-3f44-4004-b68c-2fdd12c3df36" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+{
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<validation:is-true doc:name='custmoer age validation' doc:id="abb18bd8-dee6-4c8a-ade5-e45d2e794fb2" message='#["Age should be less than 30"]' config-ref="Validation_Config" expression="#[payload.age&gt;30]"/>
+		<ee:transform doc:name="Transform Message" doc:id="007c75af-888a-4e41-b760-7ec912fd22b2" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+{
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="d3ad5f39-43c3-4f11-a72b-dfee76abcee8" />
+		<choice doc:name="Choice" doc:id="885b7d1c-9400-465c-9dd0-9aed4fc3bbef" >
+			<when expression="#[payload.age&lt;30]">
+				<raise-error doc:name="Raise error" doc:id="ad23c044-55dd-495e-9fe4-f62e8048beae" type="mulesyvalidation_" description='"processing stoped as the age is less than 30"'/>
+			</when>
+			<otherwise >
+				<logger level="INFO" doc:name="Logger" doc:id="b535d14d-a3a9-4888-b78c-8206e443255b" />
+			</otherwise>
+		</choice>
+		<logger level="INFO" doc:name="Logger" doc:id="7b08b121-33e9-497b-87e3-590ca3783899" />
+		<error-handler >
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="548db180-f31c-4d93-b3c2-d998cd9b2527" >
+				<logger level="INFO" doc:name="Logger" doc:id="fae781f8-3da0-428b-9bf0-082bf51aa961" />
+			</on-error-continue>
+		</error-handler>
+	</flow>
+</mule>
